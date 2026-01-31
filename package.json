@@ -1,0 +1,26 @@
+{
+  "name": "facebook-bot-mao-fca",
+  "version": "1.0.0",
+  "description": "Facebook Bot menggunakan mao-fca dengan login appstate",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "dev": "nodemon bot.js",
+    "setup": "node setup-appstate.js"
+  },
+  "keywords": [
+    "facebook",
+    "bot",
+    "mao-fca",
+    "appstate"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "mao-fca": "1.0.4",
+    "fs-extra": "^11.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

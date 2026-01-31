@@ -1,0 +1,29 @@
+{
+  "users": {
+    "61557295175726": {
+      "balance": 1000,
+      "last_daily": 0,
+      "exp": 0,
+      "skills": {},
+      "last_work": {}
+    },
+    "100088822824954": {
+      "balance": 1500,
+      "last_daily": 1769862673021,
+      "exp": 20,
+      "skills": {},
+      "last_work": {}
+    },
+    "61568587336275": {
+      "balance": 1382,
+      "last_daily": 1769863978202,
+      "exp": 35,
+      "skills": {
+        "programming": 1
+      },
+      "last_work": {
+        "intern": 1769863997802
+      }
+    }
+  }
+}
