@@ -1,14 +1,23 @@
 {
   "users": {
     "61568587336275": {
-      "balance": 1500,
-      "last_daily": 1769929853915,
+      "balance": 1000,
+      "last_daily": 1769930969575,
       "exp": 20,
       "skills": {},
       "last_work": {},
+      "name": "Edinst",
+      "id": 2
+    },
+    "61554707631739": {
+      "balance": 1000,
+      "last_daily": 0,
+      "exp": 0,
+      "skills": {},
+      "last_work": {},
       "name": null,
-      "id": 1
+      "id": 3
     }
   },
-  "nextId": 2
+  "nextId": 4
 }
