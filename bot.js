@@ -113,32 +113,35 @@ async function startBot() {
       }
 
       console.log('✓ Bot berhasil login!');
-
-      // Setup event listener menggunakan listenMqtt
-      api.listenMqtt((err, event) => {
-      if (err) {
-        console.error('❌ Error:', err);
-        return;
-      }
-
-      // Handle pesan masuk - cek berbagai type
-      if (event.type === 'message' || event.body) {
-        handleMessage(api, event);
-      }
-
-      // Handle pesan read
-      if (event.type === 'message_read') {
-        console.log(`📖 Pesan dibaca dari: ${event.reader}`);
-      }
-
-      // Handle typing indicator
-      if (event.type === 'typ') {
-        console.log(`⌨️ ${event.from} sedang mengetik...`);
-      }
-    });
-
       console.log('🤖 Bot aktif dan siap menerima pesan!');
       console.log('Tekan Ctrl+C untuk berhenti.\n');
+
+      // Berikan delay lebih lama sebelum listenMqtt agar session sepenuhnya ready
+      setTimeout(() => {
+        // Setup event listener menggunakan listenMqtt
+        api.listenMqtt((err, event) => {
+          if (err) {
+            console.error('❌ Error listenMqtt:', err.message || err);
+            console.log('⚠️ Coba regenerate appstate: npm run setup');
+            return;
+          }
+
+          // Handle pesan masuk - cek berbagai type
+          if (event.type === 'message' || event.body) {
+            handleMessage(api, event);
+          }
+
+          // Handle pesan read
+          if (event.type === 'message_read') {
+            console.log(`📖 Pesan dibaca dari: ${event.reader}`);
+          }
+
+          // Handle typing indicator
+          if (event.type === 'typ') {
+            console.log(`⌨️ ${event.from} sedang mengetik...`);
+          }
+        });
+      }, 3000);
     });
 
   } catch (error) {
@@ -215,7 +218,16 @@ function handleCommand(api, message, threadId, senderId, event) {
   }
   
   try {
-    cmd.execute(api, cmdArgs, threadId, { userId: senderId, threadId: threadId, userRole: getUserRole(senderId, threadId) });
+    // Coba ambil info pengguna dari API untuk mendapatkan nama Facebook
+    api.getUserInfo(senderId, (err, info) => {
+      let userName = null;
+      if (!err && info && info[senderId]) {
+        userName = info[senderId].name || null;
+        console.log(`👤 User name dari API: ${userName}`);
+      }
+      
+      cmd.execute(api, cmdArgs, threadId, { userId: senderId, threadId: threadId, userRole: getUserRole(senderId, threadId), name: userName });
+    });
   } catch (err) {
     console.error(`❌ Error saat execute command ${cmdName}:`, err.message);
     api.sendMessage('❌ Terjadi error saat menjalankan command', threadId, (err) => {

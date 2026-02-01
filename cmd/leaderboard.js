@@ -18,7 +18,9 @@ module.exports = {
     
     let response = '🏆 Top 10 Terkaya\n━━━━━━━━━━━━━━━━━\n';
     users.forEach((user, index) => {
-      response += `${index + 1}. ID: ${user.id}\n   💰 $${user.balance.toLocaleString('id-ID')}\n`;
+      const display = econ.getDisplayName(user.fbId);
+      const internal = user.internalId !== null && user.internalId !== undefined ? `#${user.internalId}` : '(no id)';
+      response += `${index + 1}. ${display} ${internal}\n   💰 $${user.balance.toLocaleString('id-ID')}\n`;
     });
     
     api.sendMessage(response, threadId, (err) => {

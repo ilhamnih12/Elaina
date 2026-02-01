@@ -13,7 +13,8 @@ module.exports = {
     const skills = user.skills || {};
     const skillsText = Object.keys(skills).length === 0 ? '—' : Object.entries(skills).map(([k,v]) => `${k}:${v}`).join(', ');
     
-    const response = `💰 Saldo: $${user.balance.toLocaleString('id-ID')}\n⭐ EXP: ${user.exp || 0}\n🛠 Skills: ${skillsText}`;
+    const displayName = econ.getDisplayName(userId, userInfo.name);
+    const response = `👤 Nama: ${displayName}\n💰 Saldo: $${user.balance.toLocaleString('id-ID')}\n⭐ EXP: ${user.exp || 0}\n🛠 Skills: ${skillsText}`;
     
     api.sendMessage(response, threadId, (err) => {
       if (err) console.error('❌ Error:', err);

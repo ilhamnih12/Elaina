@@ -8,9 +8,9 @@ module.exports = {
   role: 0,
   
   execute(api, args, threadId, userInfo) {
-    const userId = userInfo.userId;
+    const fbSender = userInfo.userId;
     const argsSplit = (args || '').split(' ').filter(Boolean);
-    const targetUserId = argsSplit[0];
+    let target = argsSplit[0];
     const amount = parseInt(argsSplit[1]);
     
     if (!targetUserId || isNaN(amount)) {
@@ -28,7 +28,7 @@ module.exports = {
       return;
     }
     
-    const sender = econ.getUser(userId);
+    const sender = econ.getUser(fbSender);
     if (sender.balance < amount) {
       const response = `❌ Saldo tidak cukup! Saldo kamu: $${sender.balance.toLocaleString('id-ID')}`;
       api.sendMessage(response, threadId, (err) => {
@@ -36,23 +36,33 @@ module.exports = {
       });
       return;
     }
-    
-    if (userId === targetUserId) {
-      api.sendMessage('❌ Tidak bisa transfer ke diri sendiri', threadId, (err) => {
-        if (err) console.error('❌ Error:', err);
-      });
+    // allow target to be internal id like '#3' or '3'
+    let fbTarget = target;
+    if (/^#?\d+$/.test(target)) {
+      const num = parseInt(target.replace('#',''));
+      const fb = econ.findByInternalId(num);
+      if (!fb) {
+        api.sendMessage(`❌ Internal ID #${num} tidak ditemukan`, threadId);
+        return;
+      }
+      fbTarget = fb;
+    }
+
+    if (fbSender === fbTarget) {
+      api.sendMessage('❌ Tidak bisa transfer ke diri sendiri', threadId);
       return;
     }
-    
+
     // perform transfer
-    const data = require('../lib/economy').loadEconomy();
-    data.users[userId] = data.users[userId] || { balance: 1000, last_daily: 0, exp: 0, skills: {}, last_work: {} };
-    data.users[targetUserId] = data.users[targetUserId] || { balance: 1000, last_daily: 0, exp: 0, skills: {}, last_work: {} };
-    data.users[userId].balance -= amount;
-    data.users[targetUserId].balance += amount;
-    require('../lib/economy').saveEconomy(data);
-    
-    const response = `✅ Transfer berhasil!\n📤 Mengirim: $${amount.toLocaleString('id-ID')}\n📥 Ke: ${targetUserId}\n💰 Saldo kamu: $${data.users[userId].balance.toLocaleString('id-ID')}`;
+    const data = econ.loadEconomy();
+    data.users[fbSender] = data.users[fbSender] || econ.ensureUser(fbSender);
+    data.users[fbTarget] = data.users[fbTarget] || econ.ensureUser(fbTarget);
+    data.users[fbSender].balance -= amount;
+    data.users[fbTarget].balance += amount;
+    econ.saveEconomy(data);
+
+    const displayTarget = econ.getDisplayName(fbTarget);
+    const response = `✅ Transfer berhasil!\n📤 Mengirim: $${amount.toLocaleString('id-ID')}\n📥 Ke: ${displayTarget} (fb: ${fbTarget})\n💰 Saldo kamu: $${data.users[fbSender].balance.toLocaleString('id-ID')}`;
     
     api.sendMessage(response, threadId, (err) => {
       if (err) console.error('❌ Error:', err);
