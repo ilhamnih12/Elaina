@@ -1,35 +1,31 @@
 const econ = require('../lib/economy');
+const UI = require('../lib/ui');
 
 module.exports = {
   name: 'setn',
   aliases: ['setname'],
-  version: '1.0.0',
-  description: 'Set display name (berbayar).',
+  version: '1.1.0',
+  description: 'Ganti nama tampilan kamu (biaya $500)',
   role: 0,
+  cooldown: 10,
 
   execute(api, args, threadId, userInfo) {
     const userId = userInfo.userId;
-    const name = (args || '').trim();
-    if (!name) {
-      api.sendMessage('❌ Gunakan: /setn <nama_baru>\nContoh: /setn IlhamBot', threadId);
-      return;
+    const newName = (args || '').trim();
+
+    if (!newName) {
+      return api.sendMessage(UI.error('Gunakan: /setn <nama_baru>'), threadId);
     }
 
-    if (name.length > 32) {
-      api.sendMessage('❌ Nama terlalu panjang (maks 32 karakter)', threadId);
-      return;
+    if (newName.length > 20) {
+      return api.sendMessage(UI.error('Nama maksimal 20 karakter!'), threadId);
     }
 
-    // simple sanitize: remove newlines
-    const clean = name.replace(/\n|\r/g, ' ').trim();
-    const cost = 500;
-    const res = econ.setName(userId, clean, cost);
+    const res = econ.setName(userId, newName, 500);
     if (!res.success) {
-      api.sendMessage(`❌ Gagal set nama: ${res.reason} (butuh $${res.cost})`, threadId);
-      return;
+      return api.sendMessage(UI.error(res.reason), threadId);
     }
 
-    const user = econ.getUser(userId);
-    api.sendMessage(`✅ Nama berhasil diubah menjadi: ${user.name}\n💸 Biaya: $${res.cost}\n💰 Sisa saldo: $${user.balance.toLocaleString('id-ID')}`, threadId);
+    api.sendMessage(UI.success(`Nama tampilan kamu diganti menjadi: ${res.name} (Biaya: $500)`), threadId);
   }
 };

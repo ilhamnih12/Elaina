@@ -1,11 +1,13 @@
 const econ = require('../lib/economy');
+const UI = require('../lib/ui');
 
 module.exports = {
   name: 'work',
   aliases: ['w'],
-  version: '1.1.0',
-  description: 'Bekerja untuk mendapatkan uang (gunakan /work <jobKey>)',
+  version: '1.2.0',
+  description: 'Bekerja untuk mendapatkan uang',
   role: 0,
+  cooldown: 5,
   
   execute(api, args, threadId, userInfo) {
     const userId = userInfo.userId;
@@ -13,13 +15,15 @@ module.exports = {
 
     if (!jobKey || jobKey === 'list') {
       const jobs = econ.jobs;
-      let reply = '📋 Daftar pekerjaan:\n';
+      let reply = 'Daftar pekerjaan yang tersedia:\n\n';
       for (const k of Object.keys(jobs)) {
         const j = jobs[k];
-        reply += `- ${k}: ${j.title} (EXP req: ${j.req.exp}, Skills: ${Object.keys(j.req.skills||{}).map(s=>s+':'+j.req.skills[s]).join(', ') || '—'})\n  Gaji: $${j.payMin} - $${j.payMax}\n`;
+        reply += `• [${k.toUpperCase()}] ${j.title}\n`;
+        reply += `  Gaji: $${j.payMin} - $${j.payMax}\n`;
+        reply += `  Syarat: EXP ${j.req.exp}\n`;
       }
       reply += '\nGunakan: /work <jobKey>'; 
-      api.sendMessage(reply, threadId);
+      api.sendMessage(UI.box('Job Board', reply), threadId);
       return;
     }
 
@@ -28,15 +32,20 @@ module.exports = {
     if (!res.success) {
       if (res.reason === 'Cooldown') {
         const mins = Math.ceil((res.timeLeft || 0) / 1000 / 60);
-        api.sendMessage(`⏳ Masih cooldown. Coba lagi dalam ${mins} menit`, threadId);
+        return api.sendMessage(UI.error(`Kamu masih lelah. Coba lagi dalam ${mins} menit.`), threadId);
       } else {
-        api.sendMessage(`❌ Gagal: ${res.reason}`, threadId);
+        return api.sendMessage(UI.error(`Gagal bekerja: ${res.reason}`), threadId);
       }
-      return;
     }
 
     const user = econ.getUser(userId);
-    const response = `✅ Bekerja sebagai ${econ.jobs[jobKey].title}\n💸 Gaji: $${res.pay.toLocaleString('id-ID')}\n⭐ EXP +${res.expGain}\n💰 Saldo: $${user.balance.toLocaleString('id-ID')}`;
-    api.sendMessage(response, threadId);
+    const content = [
+      UI.success(`Berhasil bekerja sebagai ${econ.jobs[jobKey].title}`),
+      UI.item('Gaji', `$${res.pay.toLocaleString('id-ID')}`),
+      UI.item('EXP', `+${res.expGain}`),
+      UI.item('Saldo Sekarang', `$${user.balance.toLocaleString('id-ID')}`)
+    ].join('\n');
+
+    api.sendMessage(UI.box('Work Results', content), threadId);
   }
 };

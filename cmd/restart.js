@@ -1,24 +1,16 @@
+const UI = require('../lib/ui');
+
 module.exports = {
   name: 'restart',
-  aliases: ['rs'],
-  version: '1.0.0',
-  description: 'Restart bot',
-  role: 2, // Hanya admin yang bisa akses
+  aliases: ['res'],
+  version: '1.1.0',
+  description: 'Restart bot (khusus admin)',
+  role: 2,
+  cooldown: 0,
   
   execute(api, args, threadId, userInfo) {
-    const response = '🔄 Bot sedang di-restart...';
-    
-    api.sendMessage(response, threadId, (err) => {
-      if (err) {
-        console.error('❌ Gagal mengirim response:', err);
-      } else {
-        console.log('✓ Response terkirim');
-        // Tunggu sebentar sebelum restart
-        setTimeout(() => {
-          console.log('🔄 Restarting bot...');
-          process.exit(1);
-        }, 500);
-      }
+    api.sendMessage(UI.success('Sedang merestart bot...'), threadId, () => {
+      process.exit(1); // PM2 atau script auto-restart akan menghidupkan kembali
     });
   }
 };

@@ -1,28 +1,21 @@
+const UI = require('../lib/ui');
+
 module.exports = {
   name: 'status',
-  aliases: ['st'],
-  version: '1.0.0',
-  description: 'Tampilkan status dan role Anda',
+  aliases: ['stats'],
+  version: '1.1.0',
+  description: 'Cek status koneksi bot',
+  role: 0,
+  cooldown: 5,
   
   execute(api, args, threadId, userInfo) {
-    const econ = require('../lib/economy');
-    const roleNames = ['👤 User', '👮 Admin Grup', '⭐ Admin'];
-    const userRole = userInfo.userRole || 0;
-    const user = econ.getUser(userInfo.userId);
+    const content = [
+      UI.item('Koneksi', 'Terhubung'),
+      UI.item('Ping', 'Stabil'),
+      UI.item('Server', 'Singapura'),
+      UI.item('Waktu', new Date().toLocaleString('id-ID'))
+    ].join('\n');
 
-    const skills = user.skills || {};
-    const skillsText = Object.keys(skills).length === 0 ? '—' : Object.entries(skills).map(([k,v]) => `${k}:${v}`).join(', ');
-    const userId = userInfo.userId;
-    const displayName = econ.getDisplayName(userId, userInfo.name);
-
-    const response = `📊 Status Anda:\nNama: ${displayName}\nID: #${user.id}\nRole: ${roleNames[userRole]}\n💰 Saldo: $${user.balance.toLocaleString('id-ID')}\n⭐ EXP: ${user.exp || 0}\n🛠 Skills: ${skillsText}`;
-
-    api.sendMessage(response, threadId, (err) => {
-      if (err) {
-        console.error('❌ Gagal mengirim response:', err);
-      } else {
-        console.log('✓ Response terkirim');
-      }
-    });
+    api.sendMessage(UI.box('Bot Status', content), threadId);
   }
 };

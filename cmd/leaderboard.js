@@ -1,31 +1,26 @@
 const econ = require('../lib/economy');
+const UI = require('../lib/ui');
 
 module.exports = {
   name: 'leaderboard',
-  aliases: ['lb', 'rank'],
-  version: '1.0.0',
-  description: 'Lihat ranking top 10 terkaya',
+  aliases: ['lb', 'top'],
+  version: '1.1.0',
+  description: 'Tampilkan 10 user terkaya',
   role: 0,
+  cooldown: 10,
   
   execute(api, args, threadId, userInfo) {
-    const users = econ.getLeaderboard(10);
-    if (!users || users.length === 0) {
-      api.sendMessage('❌ Belum ada data ekonomi', threadId, (err) => {
-        if (err) console.error('❌ Error:', err);
-      });
-      return;
+    const topUsers = econ.getLeaderboard(10);
+
+    if (topUsers.length === 0) {
+      return api.sendMessage(UI.error('Belum ada data user di leaderboard.'), threadId);
     }
     
-    let response = '🏆 Top 10 Terkaya\n━━━━━━━━━━━━━━━━━\n';
-    users.forEach((user, index) => {
-      const display = econ.getDisplayName(user.fbId);
-      const internal = user.internalId !== null && user.internalId !== undefined ? `#${user.internalId}` : '(no id)';
-      response += `${index + 1}. ${display} ${internal}\n   💰 $${user.balance.toLocaleString('id-ID')}\n`;
-    });
+    const content = topUsers.map((u, index) => {
+      const name = u.name || u.fbId;
+      return `${index + 1}. ${name} - $${u.balance.toLocaleString('id-ID')}`;
+    }).join('\n');
     
-    api.sendMessage(response, threadId, (err) => {
-      if (err) console.error('❌ Error:', err);
-      else console.log('✓ Leaderboard message sent');
-    });
+    api.sendMessage(UI.box('Rich Leaderboard', content), threadId);
   }
 };

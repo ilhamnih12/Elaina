@@ -1,47 +1,41 @@
 const econ = require('../lib/economy');
+const UI = require('../lib/ui');
 
 module.exports = {
   name: 'train',
-  aliases: ['tr'],
-  version: '1.0.0',
-  description: 'Latih skill tertentu (cost 200)',
+  aliases: ['t', 'skill'],
+  version: '1.1.0',
+  description: 'Latih skill kamu (biaya meningkat per level)',
   role: 0,
+  cooldown: 5,
 
   execute(api, args, threadId, userInfo) {
     const userId = userInfo.userId;
-    const param = (args || '').trim().toLowerCase();
+    const skill = (args || '').trim().toLowerCase();
 
-    if (!param || param === 'list') {
-      // build skill list from jobs
-      const skillSet = new Set();
-      Object.values(econ.jobs).forEach(j => {
-        Object.keys(j.req.skills || {}).forEach(s => skillSet.add(s));
-      });
-      const skills = Array.from(skillSet);
-      if (skills.length === 0) {
-        api.sendMessage('ℹ️ Tidak ada skill yang terdaftar.', threadId);
-        return;
-      }
-      const user = econ.getUser(userId);
-      let reply = '📚 Skill tersedia dan level Anda:\n';
-      skills.forEach(s => {
-        const lvl = (user.skills && user.skills[s]) || 0;
-        const nextCost = 200 * (lvl + 1);
-        reply += `- ${s}: level ${lvl} (next cost $${nextCost})\n`;
-      });
-      api.sendMessage(reply, threadId);
-      return;
+    if (!skill) {
+      const availableSkills = ['programming', 'design', 'management'];
+      const content = [
+        'Gunakan: /train <nama_skill>',
+        '',
+        'Skill yang tersedia:',
+        ...availableSkills.map(s => `• ${s}`)
+      ].join('\n');
+      return api.sendMessage(UI.box('Training Center', content), threadId);
     }
 
-    const skill = param;
-    const res = econ.trainSkill(userId, skill, 200);
+    const res = econ.trainSkill(userId, skill);
     if (!res.success) {
-      const costNeeded = res.cost ? ` (butuh $${res.cost})` : '';
-      api.sendMessage(`❌ Gagal: ${res.reason}${costNeeded}`, threadId);
-      return;
+      return api.sendMessage(UI.error(`${res.reason}. Membutuhkan $${res.cost.toLocaleString('id-ID')}`), threadId);
     }
 
-    const user = econ.getUser(userId);
-    api.sendMessage(`✅ Latihan berhasil! Skill ${skill} sekarang level ${res.newLevel}\n💸 Biaya: $${res.cost.toLocaleString('id-ID')}\n⭐ EXP +${res.expGain}\n💰 Saldo: $${user.balance.toLocaleString('id-ID')}\n⭐ EXP: ${user.exp}`, threadId);
+    const content = [
+      UI.success(`Berhasil melatih skill ${skill}!`),
+      UI.item('Level Baru', res.newLevel),
+      UI.item('Biaya', `$${res.cost.toLocaleString('id-ID')}`),
+      UI.item('EXP', `+${res.expGain}`)
+    ].join('\n');
+
+    api.sendMessage(UI.box('Skill Upgraded', content), threadId);
   }
 };

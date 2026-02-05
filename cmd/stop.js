@@ -1,24 +1,16 @@
+const UI = require('../lib/ui');
+
 module.exports = {
   name: 'stop',
-  aliases: ['s'],
-  version: '1.0.0',
-  description: 'Stop bot',
-  role: 2, // Hanya admin yang bisa akses
+  aliases: ['shutdown', 'off'],
+  version: '1.1.0',
+  description: 'Matikan bot secara total (khusus admin)',
+  role: 2,
+  cooldown: 0,
   
   execute(api, args, threadId, userInfo) {
-    const response = '🛑 Bot sedang dihentikan...';
-    
-    api.sendMessage(response, threadId, (err) => {
-      if (err) {
-        console.error('❌ Gagal mengirim response:', err);
-      } else {
-        console.log('✓ Response terkirim');
-        // Tunggu sebentar sebelum stop
-        setTimeout(() => {
-          console.log('🛑 Stopping bot...');
-          process.exit(0);
-        }, 500);
-      }
+    api.sendMessage(UI.success('Bot akan dimatikan. Sampai jumpa!'), threadId, () => {
+      process.exit(0);
     });
   }
 };

@@ -1,79 +1,73 @@
 const fs = require('fs-extra');
 const path = require('path');
+const UI = require('../lib/ui');
 
 module.exports = {
   name: 'admin',
   aliases: ['adm', 'a'],
-  version: '1.0.0',
+  version: '1.1.0',
   description: 'Perintah khusus admin (kelola config)',
-  role: 2, // Hanya admin yang bisa akses
+  role: 2,
+  cooldown: 5,
   
   execute(api, args, threadId, userInfo) {
     const configPath = path.join(__dirname, '..', 'config.json');
-    
-    const subCommand = (args || '').split(' ')[0].toLowerCase();
-    
-    let response = '❌ Subcommand tidak dikenal.\n';
-    response += 'Gunakan: /admin [list|addrole|removerole]\n';
+    const subArgs = (args || '').trim().split(' ');
+    const subCommand = subArgs[0].toLowerCase();
     
     if (!subCommand) {
-      api.sendMessage(response, threadId);
-      return;
+      const msg = [
+        'Gunakan:',
+        UI.item('list', 'Daftar admin'),
+        UI.item('addrole <id>', 'Tambah admin'),
+        UI.item('removerole <id>', 'Hapus admin')
+      ].join('\n');
+      return api.sendMessage(UI.box('Admin Panel', msg), threadId);
     }
     
     try {
       const config = fs.readJsonSync(configPath);
       
       if (subCommand === 'list') {
+        let content = '';
         if (!Array.isArray(config.admins) || config.admins.length === 0) {
-          response = 'ℹ️ Belum ada admin terdaftar';
+          content = 'Belum ada admin terdaftar.';
         } else {
-          response = '👥 Daftar Admin:\n' + config.admins.join('\n');
+          content = 'Daftar Admin:\n' + config.admins.map(id => `• ${id}`).join('\n');
         }
+        return api.sendMessage(UI.box('Admin List', content), threadId);
       }
-      else if (subCommand === 'addrole') {
-        const userId = args.split(' ')[1];
-        if (!userId) {
-          api.sendMessage('❌ Gunakan: /admin addrole <user_id>', threadId);
-          return;
-        }
+
+      if (subCommand === 'addrole') {
+        const userId = subArgs[1];
+        if (!userId) return api.sendMessage(UI.error('Gunakan: /admin addrole <user_id>'), threadId);
         
         if (!config.admins.includes(userId)) {
           config.admins.push(userId);
           fs.writeJsonSync(configPath, config, { spaces: 2 });
-          response = `✓ Admin ${userId} ditambahkan`;
+          return api.sendMessage(UI.success(`Admin ${userId} berhasil ditambahkan.`), threadId);
         } else {
-          response = `⚠️ Admin ${userId} sudah ada`;
+          return api.sendMessage(UI.error(`Admin ${userId} sudah terdaftar.`), threadId);
         }
       }
       
-      else if (subCommand === 'removerole') {
-        const userId = args.split(' ')[1];
-        if (!userId) {
-          api.sendMessage('❌ Gunakan: /admin removerole <user_id>', threadId);
-          return;
-        }
+      if (subCommand === 'removerole') {
+        const userId = subArgs[1];
+        if (!userId) return api.sendMessage(UI.error('Gunakan: /admin removerole <user_id>'), threadId);
         
         if (config.admins.includes(userId)) {
           config.admins = config.admins.filter(id => id !== userId);
           fs.writeJsonSync(configPath, config, { spaces: 2 });
-          response = `✓ Admin ${userId} dihapus`;
+          return api.sendMessage(UI.success(`Admin ${userId} berhasil dihapus.`), threadId);
         } else {
-          response = `⚠️ Admin ${userId} tidak ditemukan`;
+          return api.sendMessage(UI.error(`Admin ${userId} tidak ditemukan.`), threadId);
         }
       }
       
-      else {
-        response = '❌ Subcommand tidak dikenal: ' + subCommand;
-      }
+      return api.sendMessage(UI.error(`Subcommand '${subCommand}' tidak dikenal.`), threadId);
       
     } catch (err) {
-      console.error('Error:', err.message);
-      response = '❌ Error: ' + err.message;
+      api.sendMessage(UI.error(`Terjadi kesalahan: ${err.message}`), threadId);
     }
-    
-    api.sendMessage(response, threadId, (err) => {
-      if (err) console.error('❌ Gagal mengirim response:', err);
-    });
   }
 };
