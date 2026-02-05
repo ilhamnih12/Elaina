@@ -23,11 +23,15 @@ module.exports = {
       return;
     }
     
-    econ.addMoney(userId, dailyReward);
-    econ.setLastDaily(userId, now);
-    econ.addExp(userId, 20);
+    const data = econ.loadEconomy();
+    econ.ensureUser(userId, data);
+    const userUpdate = data.users[userId];
+    userUpdate.balance += dailyReward;
+    userUpdate.last_daily = now;
+    userUpdate.exp = (userUpdate.exp || 0) + 20;
+    econ.saveEconomy(data);
     
-    const newUser = econ.getUser(userId);
+    const newUser = userUpdate;
     const response = `🎁 Bonus harian klaim!\n💸 Dapat: $${dailyReward.toLocaleString('id-ID')}\n⭐ EXP +20\n💰 Total saldo: $${newUser.balance.toLocaleString('id-ID')}`;
     
     api.sendMessage(response, threadId, (err) => {
