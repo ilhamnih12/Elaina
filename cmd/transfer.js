@@ -13,8 +13,8 @@ module.exports = {
     let target = argsSplit[0];
     const amount = parseInt(argsSplit[1]);
     
-    if (!targetUserId || isNaN(amount)) {
-      const response = '❌ Gunakan: /transfer <user_id> <amount>\nContoh: /transfer 1234567890 500';
+    if (!target || isNaN(amount)) {
+      const response = '❌ Gunakan: /transfer <user_id> <amount>\nContoh: /transfer 1234567890 500\nAtau gunakan internal ID: /transfer #1 500';
       api.sendMessage(response, threadId, (err) => {
         if (err) console.error('❌ Error:', err);
       });
@@ -28,14 +28,6 @@ module.exports = {
       return;
     }
     
-    const sender = econ.getUser(fbSender);
-    if (sender.balance < amount) {
-      const response = `❌ Saldo tidak cukup! Saldo kamu: $${sender.balance.toLocaleString('id-ID')}`;
-      api.sendMessage(response, threadId, (err) => {
-        if (err) console.error('❌ Error:', err);
-      });
-      return;
-    }
     // allow target to be internal id like '#3' or '3'
     let fbTarget = target;
     if (/^#?\d+$/.test(target)) {
@@ -53,10 +45,19 @@ module.exports = {
       return;
     }
 
+    const sender = econ.getUser(fbSender);
+    if (sender.balance < amount) {
+      const response = `❌ Saldo tidak cukup! Saldo kamu: $${sender.balance.toLocaleString('id-ID')}`;
+      api.sendMessage(response, threadId, (err) => {
+        if (err) console.error('❌ Error:', err);
+      });
+      return;
+    }
+
     // perform transfer
     const data = econ.loadEconomy();
-    data.users[fbSender] = data.users[fbSender] || econ.ensureUser(fbSender);
-    data.users[fbTarget] = data.users[fbTarget] || econ.ensureUser(fbTarget);
+    econ.ensureUser(fbSender, data);
+    econ.ensureUser(fbTarget, data);
     data.users[fbSender].balance -= amount;
     data.users[fbTarget].balance += amount;
     econ.saveEconomy(data);
