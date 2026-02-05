@@ -1,11 +1,13 @@
 const econ = require('../lib/economy');
+const UI = require('../lib/ui');
 
 module.exports = {
   name: 'daily',
   aliases: ['d'],
-  version: '1.0.0',
+  version: '1.1.0',
   description: 'Klaim bonus harian',
   role: 0,
+  cooldown: 3,
   
   execute(api, args, threadId, userInfo) {
     const userId = userInfo.userId;
@@ -16,11 +18,7 @@ module.exports = {
     
     if (user.last_daily && (now - user.last_daily) < cooldown) {
       const timeLeft = Math.ceil((cooldown - (now - user.last_daily)) / 1000 / 60 / 60);
-      const response = `⏰ Sudah klaim daily hari ini!\nBisa klaim lagi dalam ${timeLeft} jam`;
-      api.sendMessage(response, threadId, (err) => {
-        if (err) console.error('❌ Error:', err);
-      });
-      return;
+      return api.sendMessage(UI.error(`Sudah klaim daily hari ini! Bisa klaim lagi dalam ${timeLeft} jam.`), threadId);
     }
     
     const data = econ.loadEconomy();
@@ -31,12 +29,13 @@ module.exports = {
     userUpdate.exp = (userUpdate.exp || 0) + 20;
     econ.saveEconomy(data);
     
-    const newUser = userUpdate;
-    const response = `🎁 Bonus harian klaim!\n💸 Dapat: $${dailyReward.toLocaleString('id-ID')}\n⭐ EXP +20\n💰 Total saldo: $${newUser.balance.toLocaleString('id-ID')}`;
+    const content = [
+      UI.success('Bonus harian berhasil diklaim!'),
+      UI.item('Dapat', `$${dailyReward.toLocaleString('id-ID')}`),
+      UI.item('EXP', '+20'),
+      UI.item('Total Saldo', `$${userUpdate.balance.toLocaleString('id-ID')}`)
+    ].join('\n');
     
-    api.sendMessage(response, threadId, (err) => {
-      if (err) console.error('❌ Error:', err);
-      else console.log('✓ Daily message sent');
-    });
+    api.sendMessage(UI.box('Daily Reward', content), threadId);
   }
 };

@@ -1,24 +1,17 @@
+const UI = require('../lib/ui');
+
 module.exports = {
   name: 'echo',
-  aliases: ['e'],
-  version: '1.0.0',
-  description: 'Ulang pesan yang dikirim',
-  role: 0, // Semua user bisa akses
+  aliases: ['say'],
+  version: '1.1.0',
+  description: 'Mengulangi pesan yang kamu kirim',
+  role: 0,
+  cooldown: 2,
   
   execute(api, args, threadId, userInfo) {
-    if (!args || args.trim().length === 0) {
-      api.sendMessage('❌ Gunakan: /echo <pesan>', threadId);
-      return;
+    if (!args) {
+      return api.sendMessage(UI.error('Berikan pesan untuk diulangi!'), threadId);
     }
-    
-    const response = args;
-    
-    api.sendMessage(response, threadId, (err) => {
-      if (err) {
-        console.error('❌ Gagal mengirim response:', err);
-      } else {
-        console.log('✓ Echo terkirim');
-      }
-    });
+    api.sendMessage(args, threadId);
   }
 };

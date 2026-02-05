@@ -1,6 +1,7 @@
 const login = require('mao-fca');
 const fs = require('fs-extra');
 const path = require('path');
+const UI = require('./lib/ui');
 
 // Path untuk menyimpan appstate
 const appstatePath = path.join(__dirname, 'appstate.json');
@@ -23,6 +24,7 @@ if (fs.existsSync(configPath)) {
 // Load semua command dari folder cmd
 const cmdPath = path.join(__dirname, 'cmd');
 const commands = new Map();
+const cooldowns = new Map();
 
 function loadCommands() {
   if (!fs.existsSync(cmdPath)) {
@@ -189,33 +191,47 @@ function handleCommand(api, message, threadId, senderId, event) {
   // Cek apakah command ada
   if (!commands.has(cmdName)) {
     console.log(`❌ Command ${cmdName} tidak ditemukan. Available: ${Array.from(commands.keys()).join(', ')}`);
-    const response = `❌ Command '/${cmdName}' tidak dikenal.\nKetik /help untuk melihat command yang tersedia.`;
-    api.sendMessage(response, threadId, (err) => {
-      if (err) console.error('❌ Gagal mengirim response:', err);
-      else console.log('✓ Error message terkirim');
-    });
+    const response = UI.error(`Command '/${cmdName}' tidak dikenal.\nKetik /help untuk melihat daftar command.`);
+    api.sendMessage(response, threadId);
     return;
   }
 
   // Jalankan command
   const cmd = commands.get(cmdName);
-  console.log(`✓ Menjalankan command: ${cmd.name} v${cmd.version}`);
   
   // Cek role jika command memerlukan
   if (cmd.role !== undefined) {
     const userRole = getUserRole(senderId, threadId);
-    const roleNames = ['User', 'Admin Grup', 'Admin'];
-    
-    console.log(`👤 User role: ${roleNames[userRole]} (${userRole}), Required: ${roleNames[cmd.role]} (${cmd.role})`);
     
     if (userRole < cmd.role) {
-      const response = `❌ Command ini memerlukan role: ${roleNames[cmd.role]}`;
-      api.sendMessage(response, threadId, (err) => {
-        if (err) console.error('❌ Gagal mengirim response:', err);
-      });
+      const response = UI.error(`Command ini memerlukan role: ${UI.getRoleName(cmd.role)}`);
+      api.sendMessage(response, threadId);
       return;
     }
   }
+
+  // Cooldown logic
+  if (!cooldowns.has(cmd.name)) {
+    cooldowns.set(cmd.name, new Map());
+  }
+
+  const now = Date.now();
+  const timestamps = cooldowns.get(cmd.name);
+  const cooldownAmount = (cmd.cooldown || 3) * 1000;
+
+  if (timestamps.has(senderId)) {
+    const expirationTime = timestamps.get(senderId) + cooldownAmount;
+
+    if (now < expirationTime) {
+      const timeLeft = (expirationTime - now) / 1000;
+      return api.sendMessage(UI.error(`Mohon tunggu ${timeLeft.toFixed(1)} detik sebelum menggunakan command /${cmd.name} lagi.`), threadId);
+    }
+  }
+
+  timestamps.set(senderId, now);
+  setTimeout(() => timestamps.delete(senderId), cooldownAmount);
+
+  console.log(`⚡ Menjalankan command: ${cmd.name} v${cmd.version}`);
   
   try {
     // Coba ambil info pengguna dari API untuk mendapatkan nama Facebook
@@ -226,13 +242,21 @@ function handleCommand(api, message, threadId, senderId, event) {
         console.log(`👤 User name dari API: ${userName}`);
       }
       
-      cmd.execute(api, cmdArgs, threadId, { userId: senderId, threadId: threadId, userRole: getUserRole(senderId, threadId), name: userName });
+      try {
+        cmd.execute(api, cmdArgs, threadId, {
+          userId: senderId,
+          threadId: threadId,
+          userRole: getUserRole(senderId, threadId),
+          name: userName
+        });
+      } catch (executeErr) {
+        console.error(`❌ Error saat execute command ${cmdName}:`, executeErr);
+        api.sendMessage(UI.error(`Terjadi kesalahan: ${executeErr.message}`), threadId);
+      }
     });
   } catch (err) {
-    console.error(`❌ Error saat execute command ${cmdName}:`, err.message);
-    api.sendMessage('❌ Terjadi error saat menjalankan command', threadId, (err) => {
-      if (err) console.error('❌ Gagal mengirim error message:', err);
-    });
+    console.error(`❌ Error sistem:`, err.message);
+    api.sendMessage(UI.error(`Terjadi kesalahan sistem: ${err.message}`), threadId);
   }
 }
 

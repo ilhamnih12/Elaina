@@ -1,22 +1,20 @@
+const UI = require('../lib/ui');
+
 module.exports = {
   name: 'uid',
-  aliases: ['u'],
-  version: '1.0.0',
-  description: 'Tampilkan user ID Anda',
-  role: 0, // Semua user bisa akses
+  aliases: ['id', 'me'],
+  version: '1.1.0',
+  description: 'Cek User ID kamu',
+  role: 0,
+  cooldown: 2,
   
   execute(api, args, threadId, userInfo) {
-    const econ = require('../lib/economy');
-    const user = econ.getUser(userInfo.userId);
-    const displayName = econ.getDisplayName(userInfo.userId, userInfo.name);
-    const response = `🔢 Internal ID: #${user.id}\nNama: ${displayName}`;
+    const content = [
+      UI.item('Nama', userInfo.name || 'Tidak diketahui'),
+      UI.item('FB ID', userInfo.userId),
+      UI.item('Thread ID', threadId)
+    ].join('\n');
     
-    api.sendMessage(response, threadId, (err) => {
-      if (err) {
-        console.error('❌ Gagal mengirim response:', err);
-      } else {
-        console.log('✓ Response terkirim');
-      }
-    });
+    api.sendMessage(UI.box('User Identity', content), threadId);
   }
 };
