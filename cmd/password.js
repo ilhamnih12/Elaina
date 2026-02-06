@@ -3,7 +3,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'password',
   aliases: ['pass', 'pw'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Generate password acak',
   role: 0,
   category: 'Utility',

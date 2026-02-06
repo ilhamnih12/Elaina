@@ -4,7 +4,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'train',
   aliases: ['t', 'skill'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Latih skill kamu (biaya meningkat per level)',
   role: 0,
   category: 'Economy',

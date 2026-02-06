@@ -5,7 +5,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'admin',
   aliases: ['adm', 'a'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Perintah khusus admin (kelola config)',
   role: 2,
   category: 'Admin',

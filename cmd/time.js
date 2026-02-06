@@ -3,7 +3,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'time',
   aliases: ['waktu', 'jam'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Menampilkan waktu saat ini',
   role: 0,
   category: 'Info',

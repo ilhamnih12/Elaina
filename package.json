@@ -1,6 +1,6 @@
 {
   "name": "facebook-bot-mao-fca",
-  "version": "0.9.0-bt",
+  "version": "0.9.1-bt",
   "description": "Facebook Bot menggunakan mao-fca dengan login appstate",
   "main": "bot.js",
   "scripts": {

@@ -1,12 +1,13 @@
-# 🤖 Facebook Messenger Bot (v0.9.0-bt)
+# 🤖 Facebook Messenger Bot (v0.9.1-bt)
 
-Bot Facebook modern yang dibangun dengan Node.js dan library `mao-fca`. Hadir dengan sistem ekonomi terintegrasi, utilitas lengkap, dan antarmuka teks yang minimalis.
+Bot Facebook modern yang dibangun dengan Node.js dan library `mao-fca`. Hadir dengan sistem ekonomi terintegrasi, utilitas lengkap, game seru, dan antarmuka teks yang minimalis.
 
-> **Status:** Beta (Major Update 0.9.0)
+> **Status:** Beta (Minor Update 0.9.1)
 
 ## 🌟 Fitur Utama
 
 - 💰 **Sistem Ekonomi:** Kerja, daily reward, training skill, dan transfer uang.
+- 🎮 **Game Seru:** Slots, Roulette, RPS, dan lainnya untuk menambah saldo.
 - 🛠️ **Utility Lengkap:** Kalkulator, konversi satuan, binary tool, dan banyak lagi.
 - 📊 **Sistem Status:** Cek profil user dan statistik sistem dalam satu tempat.
 - 📂 **Command Terkategori:** Navigasi bantuan yang lebih rapi dan mudah digunakan.
@@ -33,6 +34,13 @@ Bot Facebook modern yang dibangun dengan Node.js dan library `mao-fca`. Hadir de
 ## 🎮 Command yang Tersedia
 
 Gunakan prefix `/` untuk menjalankan perintah. Ketik `/help` untuk daftar lengkap.
+
+### 🎮 Games
+- `/slots` - Main mesin slot.
+- `/roulette` - Taruhan warna roulette.
+- `/rps` - Gunting Batu Kertas.
+- `/coinbet` - Taruhan lempar koin.
+- `/tebakangka` - Tebak angka 1-10.
 
 ### 📈 Economy
 - `/status` - Cek profil, saldo, dan skill kamu.

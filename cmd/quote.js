@@ -13,7 +13,7 @@ const quotes = [
 module.exports = {
   name: 'quote',
   aliases: ['kata', 'bijak'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Dapatkan kata-kata bijak acak',
   role: 0,
   category: 'Utility',

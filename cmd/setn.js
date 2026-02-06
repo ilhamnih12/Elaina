@@ -4,7 +4,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'setn',
   aliases: ['setname'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Ganti nama tampilan kamu (biaya $500)',
   role: 0,
   category: 'Economy',

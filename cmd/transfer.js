@@ -4,7 +4,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'transfer',
   aliases: ['tf', 'pay'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Transfer uang ke user lain',
   role: 0,
   category: 'Economy',

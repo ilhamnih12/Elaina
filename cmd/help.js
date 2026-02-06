@@ -5,7 +5,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'help',
   aliases: ['h'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Tampilkan daftar command yang tersedia',
   role: 0,
   category: 'Info',

@@ -4,7 +4,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'status',
   aliases: ['stats', 'profile', 'bal', 'balance'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Cek profil dan saldo kamu',
   role: 0,
   category: 'Economy',

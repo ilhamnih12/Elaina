@@ -3,7 +3,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'uid',
   aliases: ['id', 'me'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Cek User ID kamu',
   role: 0,
   category: 'Info',

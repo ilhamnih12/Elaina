@@ -3,7 +3,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'unit',
   aliases: ['konversi'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Konversi satuan sederhana (cm/inch, kg/lbs, c/f)',
   role: 0,
   category: 'Utility',

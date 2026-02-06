@@ -3,7 +3,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'flip',
   aliases: ['koin', 'coinflip'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Lempar koin (Heads/Tails)',
   role: 0,
   category: 'Utility',

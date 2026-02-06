@@ -4,7 +4,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'leaderboard',
   aliases: ['lb', 'top'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Tampilkan 10 user terkaya',
   role: 0,
   category: 'Economy',

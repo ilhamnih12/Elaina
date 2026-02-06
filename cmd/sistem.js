@@ -4,7 +4,7 @@ const os = require('os');
 module.exports = {
   name: 'sistem',
   aliases: ['sys', 'vps', 'ping'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Informasi sistem dan koneksi bot',
   role: 0,
   category: 'Info',

@@ -3,7 +3,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'calc',
   aliases: ['hitung', 'kalkulator'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Kalkulator sederhana',
   role: 0,
   category: 'Utility',

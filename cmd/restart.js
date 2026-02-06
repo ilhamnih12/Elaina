@@ -3,7 +3,7 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'restart',
   aliases: ['res'],
-  version: '0.9.0-bt',
+  version: '0.9.1-bt',
   description: 'Restart bot (khusus admin)',
   role: 2,
   category: 'Admin',
