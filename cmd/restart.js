@@ -3,10 +3,9 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'restart',
   aliases: ['res'],
-  version: '0.9.0-bt',
+  version: '1.1.0',
   description: 'Restart bot (khusus admin)',
   role: 2,
-  category: 'Admin',
   cooldown: 0,
   
   execute(api, args, threadId, userInfo) {

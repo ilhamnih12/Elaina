@@ -3,10 +3,9 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'echo',
   aliases: ['say'],
-  version: '0.9.0-bt',
+  version: '1.1.0',
   description: 'Mengulangi pesan yang kamu kirim',
   role: 0,
-  category: 'Utility',
   cooldown: 2,
   
   execute(api, args, threadId, userInfo) {

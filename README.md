@@ -1,82 +1,165 @@
-# 🤖 Facebook Messenger Bot (v0.9.0-bt)
+# Facebook Bot dengan mao-fca
 
-Bot Facebook modern yang dibangun dengan Node.js dan library `mao-fca`. Hadir dengan sistem ekonomi terintegrasi, utilitas lengkap, dan antarmuka teks yang minimalis.
+Bot Facebook sederhana menggunakan library `mao-fca` dengan login menggunakan appstate.
 
-> **Status:** Beta (Major Update 0.9.0)
+## Fitur
 
-## 🌟 Fitur Utama
+- ✅ Login dengan appstate (menyimpan session)
+- ✅ Auto-reply pesan
+- ✅ Command system (!ping, !help, !time, !info)
+- ✅ Event listener untuk pesan, read receipts, dan typing indicator
+- ✅ Error handling
 
-- 💰 **Sistem Ekonomi:** Kerja, daily reward, training skill, dan transfer uang.
-- 🛠️ **Utility Lengkap:** Kalkulator, konversi satuan, binary tool, dan banyak lagi.
-- 📊 **Sistem Status:** Cek profil user dan statistik sistem dalam satu tempat.
-- 📂 **Command Terkategori:** Navigasi bantuan yang lebih rapi dan mudah digunakan.
-- ⚡ **Minimalis UI:** Menggunakan box-drawing characters untuk tampilan yang elegan di chat.
+## Instalasi
 
-## 🚀 Instalasi & Setup
-
-1. **Clone & Install:**
-   ```bash
-   npm install
-   ```
-
-2. **Setup Appstate:**
-   Ekstrak cookies Facebook Anda menjadi `appstate.json` dengan:
-   ```bash
-   npm run setup
-   ```
-
-3. **Jalankan Bot:**
-   ```bash
-   npm start
-   ```
-
-## 🎮 Command yang Tersedia
-
-Gunakan prefix `/` untuk menjalankan perintah. Ketik `/help` untuk daftar lengkap.
-
-### 📈 Economy
-- `/status` - Cek profil, saldo, dan skill kamu.
-- `/work` - Bekerja untuk mendapatkan uang.
-- `/daily` - Klaim bonus harian.
-- `/leaderboard` - Daftar user terkaya.
-- `/train` - Tingkatkan skill untuk gaji lebih besar.
-- `/transfer` - Kirim uang ke user lain.
-
-### 🛠️ Utility
-- `/calc` - Kalkulator matematika.
-- `/dice` - Lempar dadu keberuntungan.
-- `/flip` - Lempar koin (Heads/Tails).
-- `/quote` - Kata-kata bijak hari ini.
-- `/binary` - Encode/decode teks ke biner.
-- `/password` - Generate password acak yang aman.
-- `/unit` - Konversi satuan (cm, kg, suhu).
-
-### ℹ️ Info
-- `/help` - Tampilkan menu bantuan.
-- `/sistem` - Info host bot, ping, dan uptime.
-- `/info` - Tentang bot ini.
-- `/uid` - Cek ID Facebook dan Thread.
-
-### 🔐 Admin
-- `/admin` - Kelola admin bot.
-- `/restart` - Restart bot.
-- `/stop` - Matikan bot.
-
-## 🛠️ Struktur Project
-
-```
-├── cmd/                # Handler perintah bot
-├── lib/                # Library inti (Economy, UI, etc.)
-├── appstate.json       # Session login (Jangan dibagikan!)
-├── config.json         # Konfigurasi admin
-├── economy.json        # Database ekonomi (JSON)
-└── bot.js              # Entry point utama
+```bash
+npm install
 ```
 
-## ⚠️ Keamanan
+## Setup Appstate
 
-- **JANGAN PERNAH** membagikan file `appstate.json` Anda. File ini berisi session login yang memungkinkan akses penuh ke akun Facebook Anda.
-- Gunakan akun tumbal jika perlu untuk menghindari risiko checkpoint pada akun utama.
+### Langkah 1: Extract Appstate dari Browser
+
+Jalankan setup wizard:
+```bash
+npm run setup
+```
+
+Atau ikuti langkah manual:
+
+1. **Login ke Facebook** di browser
+2. **Buka DevTools** (tekan F12)
+3. **Buka tab Console**
+4. **Copy & paste script ini:**
+
+```javascript
+(async () => {
+  const data = document.cookie
+    .split("; ")
+    .map(c => {
+      const [name, value] = c.split("=");
+      return {
+        key: name,
+        value: decodeURIComponent(value),
+        domain: ".facebook.com",
+        path: "/",
+        expirationDate: Math.floor(Date.now() / 1000) + 86400 * 365
+      };
+    });
+  console.log(JSON.stringify(data, null, 2));
+})();
+```
+
+5. **Copy hasil output**
+6. **Buat file `appstate.json`** di folder project
+7. **Paste output ke dalamnya**
+
+### Langkah 2: Jalankan Bot
+
+```bash
+npm start
+```
+
+Bot akan otomatis login menggunakan appstate.json yang tersimpan.
+
+## Menjalankan Bot
+
+```bash
+# Jalankan sekali
+npm start
+
+# Jalankan dengan nodemon (auto-reload saat ada perubahan file)
+npm run dev
+
+# Setup appstate baru
+npm run setup
+```
+
+## Command yang Tersedia
+
+- `!ping` - Test bot (respons: Pong!)
+- `!help` - Tampilkan bantuan
+- `!time` - Tampilkan waktu saat ini
+- `!info` - Informasi bot
+
+## Struktur File
+
+```
+.
+├── bot.js                # File utama bot
+├── setup-appstate.js     # Tool untuk setup appstate
+├── package.json          # Dependensi project
+├── appstate.json         # Session data (otomatis dibuat)
+└── README.md            # Dokumentasi
+```
+
+## Fitur Bot
+
+### 1. Auto-Reply
+Setiap pesan yang masuk akan di-echo/dibalas dengan pesan yang sama.
+
+### 2. Command System
+Pengguna bisa mengirim command dengan prefix `!`:
+- Contoh: `!ping` untuk menjalankan command ping
+
+### 3. Event Listener
+Bot mendengarkan:
+- `message` - Pesan baru masuk
+- `message_read` - Pesan telah dibaca
+- `typ` - Indikator user sedang mengetik
+
+## Customisasi
+
+### Mengubah Behavior Bot
+
+Edit fungsi `handleMessage()` di `bot.js` untuk mengubah respons bot.
+
+### Menambah Command Baru
+
+Tambahkan case baru di fungsi `handleCommand()`:
+
+```javascript
+case 'namakamu':
+  response = 'Saya adalah bot!';
+  break;
+```
+
+## Keamanan
+
+⚠️ **PENTING:**
+- Jangan commit `appstate.json` ke repository
+- Tambahkan `appstate.json` ke `.gitignore` (sudah ada)
+- Jangan bagikan appstate.json dengan orang lain
+- Appstate bisa di-extract dari browser, jaga keamanan akun!
+
+## Troubleshooting
+
+### "Cannot convert undefined or null to object"
+- Appstate.json format tidak valid
+- Jalankan `npm run setup` untuk extract appstate yang benar
+- Pastikan appstate fresh (baru di-extract)
+
+### "Appstate expired"
+- Logout dari Facebook dan login kembali
+- Extract appstate baru dengan `npm run setup`
+
+### "Cannot find module 'mao-fca'"
+```bash
+npm install
+```
+
+## Dependencies
+
+- `mao-fca` - Facebook Chat API (Unofficial)
+- `fs-extra` - File system utilities
+
+## Notes
+
+- Bot hanya merespons di chat pribadi (direct message)
+- Untuk group chat, modifikasi `handleMessage()` sesuai kebutuhan
+- mao-fca adalah unofficial Facebook API, gunakan dengan bijak
+- Appstate perlu di-refresh secara berkala jika expired
 
 ---
-**Dibuat dengan ❤️ oleh Community**
+
+**Dibuat dengan ❤️ menggunakan Node.js**

@@ -4,10 +4,9 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'daily',
   aliases: ['d'],
-  version: '0.9.0-bt',
+  version: '1.1.0',
   description: 'Klaim bonus harian',
   role: 0,
-  category: 'Economy',
   cooldown: 3,
   
   execute(api, args, threadId, userInfo) {
