@@ -3,9 +3,10 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'uid',
   aliases: ['id', 'me'],
-  version: '1.1.0',
+  version: '0.9.0-bt',
   description: 'Cek User ID kamu',
   role: 0,
+  category: 'Info',
   cooldown: 2,
   
   execute(api, args, threadId, userInfo) {

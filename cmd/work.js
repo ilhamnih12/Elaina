@@ -4,9 +4,10 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'work',
   aliases: ['w'],
-  version: '1.2.0',
+  version: '0.9.0-bt',
   description: 'Bekerja untuk mendapatkan uang',
   role: 0,
+  category: 'Economy',
   cooldown: 5,
   
   execute(api, args, threadId, userInfo) {
