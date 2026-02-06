@@ -5,9 +5,10 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'help',
   aliases: ['h'],
-  version: '1.1.0',
+  version: '0.9.0-bt',
   description: 'Tampilkan daftar command yang tersedia',
   role: 0,
+  category: 'Info',
   cooldown: 2,
 
   execute(api, args, threadId, userInfo) {
@@ -19,7 +20,6 @@ module.exports = {
 
       files.forEach(file => {
         try {
-          // Clear cache to get fresh data if needed, though usually not necessary for bot commands
           const fullPath = path.join(cmdPath, file);
           delete require.cache[require.resolve(fullPath)];
           const cmd = require(fullPath);
@@ -36,16 +36,16 @@ module.exports = {
 
       const query = (args || '').trim().toLowerCase();
 
-      // Jika query adalah nama command atau alias
+      // 1. Detail Command
       const foundCmd = cmds.find(c =>
         c.name.toLowerCase() === query ||
         (c.aliases && c.aliases.some(a => a.toLowerCase() === query))
       );
 
       if (foundCmd) {
-        // Tampilkan detail command
         const detail = [
           UI.item('Nama', foundCmd.name),
+          UI.item('Kategori', foundCmd.category || 'Lainnya'),
           UI.item('Alias', (foundCmd.aliases && foundCmd.aliases.length > 0) ? foundCmd.aliases.join(', ') : '—'),
           UI.item('Role', UI.getRoleName(foundCmd.role)),
           UI.item('Versi', foundCmd.version || '1.0.0'),
@@ -57,13 +57,50 @@ module.exports = {
         return api.sendMessage(UI.box('Detail Command', detail), threadId);
       }
 
-      // Logika Paging
+      // 2. Filter Kategori
+      const categories = [...new Set(cmds.map(c => (c.category || 'Lainnya').toLowerCase()))];
+      if (categories.includes(query)) {
+        const catName = query.charAt(0).toUpperCase() + query.slice(1);
+        const catCmds = cmds.filter(c => (c.category || 'Lainnya').toLowerCase() === query);
+
+        let content = catCmds.map(c => `/${c.name} - ${c.description}`).join('\n');
+        content += `\n\n💡 Ketik /help <nama command> untuk detail.`;
+
+        return api.sendMessage(UI.box(`Kategori: ${catName}`, content), threadId);
+      }
+
+      // 3. Tampilan Utama (Categorized Brief)
+      if (!query) {
+        const grouped = {};
+        cmds.forEach(c => {
+          const cat = c.category || 'Lainnya';
+          if (!grouped[cat]) grouped[cat] = [];
+          grouped[cat].push(`/${c.name}`);
+        });
+
+        let content = '';
+        for (const [cat, list] of Object.entries(grouped)) {
+          content += `\n━━━ ${cat.toUpperCase()} ━━━\n`;
+          content += list.join(', ') + '\n';
+        }
+
+        content += `\n--- Halaman [ 1 / 1 ] ---\n`;
+        content += `💡 Tips:\n• /help <nomor halaman>\n• /help <kategori>\n• /help <nama command>`;
+
+        return api.sendMessage(UI.box('Daftar Command', content.trim()), threadId);
+      }
+
+      // 4. Logika Paging (Flat List)
       const pageSize = 10;
       const totalPages = Math.ceil(cmds.length / pageSize);
-      let page = parseInt(query) || 1;
+      let page = parseInt(query);
 
-      if (isNaN(page) || page < 1) page = 1;
-      
+      if (isNaN(page)) {
+        // Jika query bukan angka, bukan kategori, dan bukan command, maka error
+        return api.sendMessage(UI.error(`Command atau kategori '${query}' tidak ditemukan.\nKetik /help untuk melihat daftar.`), threadId);
+      }
+
+      if (page < 1) page = 1;
       if (page > totalPages) {
         return api.sendMessage(UI.error(`Halaman ${page} tidak ditemukan. Total halaman: ${totalPages}`), threadId);
       }
@@ -74,7 +111,7 @@ module.exports = {
 
       let content = pageCmds.map(c => `/${c.name} - ${c.description}`).join('\n');
       content += `\n\n--- Halaman [ ${page} / ${totalPages} ] ---\n`;
-      content += `💡 Tips:\n• /help <nomor halaman>\n• /help <nama command>`;
+      content += `💡 Tips:\n• /help <nomor halaman>\n• /help <kategori>\n• /help <nama command>`;
 
       api.sendMessage(UI.box('Daftar Command', content), threadId);
 

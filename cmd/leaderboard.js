@@ -4,9 +4,10 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'leaderboard',
   aliases: ['lb', 'top'],
-  version: '1.1.0',
+  version: '0.9.0-bt',
   description: 'Tampilkan 10 user terkaya',
   role: 0,
+  category: 'Economy',
   cooldown: 10,
   
   execute(api, args, threadId, userInfo) {

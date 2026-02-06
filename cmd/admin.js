@@ -5,9 +5,10 @@ const UI = require('../lib/ui');
 module.exports = {
   name: 'admin',
   aliases: ['adm', 'a'],
-  version: '1.1.0',
+  version: '0.9.0-bt',
   description: 'Perintah khusus admin (kelola config)',
   role: 2,
+  category: 'Admin',
   cooldown: 5,
   
   execute(api, args, threadId, userInfo) {
